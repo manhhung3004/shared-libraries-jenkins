@@ -5,7 +5,7 @@
  * Sets up monitoring, alerting, and observability for deployed models
  */
 def call(Map config) {
-    echo "📊 Starting Model Monitoring Setup..."
+    echo "Starting Model Monitoring Setup..."
     
     try {
         def environment = getDeploymentEnvironment()
@@ -14,7 +14,7 @@ def call(Map config) {
         // Deploy Prometheus monitoring
         if (config.enablePrometheus) {
             sh """
-                echo "📈 Setting up Prometheus monitoring..."
+                echo "Setting up Prometheus monitoring..."
                 
                 # Apply ServiceMonitor for model metrics
                 kubectl apply -f k8s/monitoring/servicemonitor.yml -n ${namespace}
@@ -27,7 +27,7 @@ def call(Map config) {
         // Deploy Grafana dashboards
         if (config.enableGrafana) {
             sh """
-                echo "📊 Setting up Grafana dashboards..."
+                echo "Setting up Grafana dashboards..."
                 
                 # Create ConfigMap with dashboard JSON
                 kubectl create configmap ${config.modelName ?: 'diabetes-prediction'}-dashboard \\
@@ -43,7 +43,7 @@ def call(Map config) {
         
         // Setup model performance monitoring
         sh """
-            echo "🎯 Setting up model performance monitoring..."
+            echo "Setting up model performance monitoring..."
             
             # Deploy model metrics collector
             kubectl apply -f k8s/monitoring/metrics-collector.yml -n ${namespace}
@@ -55,7 +55,7 @@ def call(Map config) {
         // Configure alerting
         if (config.enableAlerting) {
             sh """
-                echo "🚨 Setting up alerting..."
+                echo "Setting up alerting..."
                 
                 # Apply AlertManager configuration
                 kubectl apply -f k8s/monitoring/alertmanager-config.yml -n monitoring
@@ -73,7 +73,7 @@ def call(Map config) {
         // Setup logging aggregation
         if (config.enableLogging) {
             sh """
-                echo "📝 Setting up logging aggregation..."
+                echo "Setting up logging aggregation..."
                 
                 # Deploy Fluent Bit for log collection
                 kubectl apply -f k8s/monitoring/fluent-bit.yml -n ${namespace}
@@ -86,7 +86,7 @@ def call(Map config) {
         // Model explainability monitoring
         if (config.enableExplainability) {
             sh """
-                echo "🔍 Setting up model explainability monitoring..."
+                echo "Setting up model explainability monitoring..."
                 
                 # Deploy SHAP/LIME explainability service
                 kubectl apply -f k8s/monitoring/explainability-service.yml -n ${namespace}
@@ -96,7 +96,7 @@ def call(Map config) {
         // A/B testing setup (if configured)
         if (config.enableABTesting) {
             sh """
-                echo "🧪 Setting up A/B testing infrastructure..."
+                echo "Setting up A/B testing infrastructure..."
                 
                 # Deploy traffic splitter
                 kubectl apply -f k8s/monitoring/traffic-splitter.yml -n ${namespace}
@@ -108,7 +108,7 @@ def call(Map config) {
         
         // Health checks and probes configuration
         sh """
-            echo "🏥 Configuring health checks..."
+            echo "Configuring health checks..."
             
             # Update deployment with monitoring probes
             kubectl patch deployment ${config.modelName ?: 'diabetes-prediction'} -n ${namespace} --patch-file k8s/monitoring/health-probes-patch.yml
@@ -150,8 +150,7 @@ EOF
         
         // Wait for monitoring components to be ready
         sh """
-            echo "⏳ Waiting for monitoring components to be ready..."
-            
+            echo "Waiting for monitoring components to be ready..."
             # Wait for metrics collector
             kubectl rollout status deployment/metrics-collector -n ${namespace} --timeout=300s || echo "Metrics collector not deployed"
             
@@ -161,7 +160,7 @@ EOF
         
         // Validate monitoring setup
         sh """
-            echo "✅ Validating monitoring setup..."
+            echo "Validating monitoring setup..."
             
             # Check if metrics endpoint is accessible
             kubectl port-forward service/${config.modelName ?: 'diabetes-prediction'} 8080:80 -n ${namespace} &
@@ -179,14 +178,14 @@ EOF
         // Archive monitoring artifacts
         archiveArtifacts artifacts: 'artifacts/monitoring/**/*', fingerprint: true
         
-        echo "✅ Model Monitoring Setup completed successfully!"
-        echo "📊 Monitoring dashboards and alerts are now configured"
+        echo "Model Monitoring Setup completed successfully!"
+        echo "Monitoring dashboards and alerts are now configured"
         
     } catch (Exception e) {
-        echo "❌ Model Monitoring Setup failed: ${e.getMessage()}"
+        echo "Model Monitoring Setup failed: ${e.getMessage()}"
         
         // Don't fail the entire pipeline for monitoring setup failures
-        echo "⚠️ Continuing pipeline despite monitoring setup failure"
+        echo "Continuing pipeline despite monitoring setup failure"
         
         // Log the error for investigation
         sh """

@@ -5,7 +5,7 @@
  * Trains ML models with hyperparameter tuning and cross-validation
  */
 def call(Map config) {
-    echo "🤖 Starting Model Training..."
+    echo "Starting Model Training..."
     
     try {
         // Activate Python environment
@@ -17,7 +17,7 @@ def call(Map config) {
         sh """
             . venv/bin/activate || venv\\Scripts\\activate
             
-            echo "🏋️ Training base model..."
+            echo "Training base model..."
             python src/models/train_model.py --config config/training_config.yml
             
             echo "🎯 Hyperparameter tuning..."

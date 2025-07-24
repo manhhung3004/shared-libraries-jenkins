@@ -5,14 +5,14 @@
  * Packages model into Docker containers and creates deployment artifacts
  */
 def call(Map config) {
-    echo "📦 Starting Model Packaging..."
+    echo " Starting Model Packaging..."
     
     try {
         // Build Docker image for model API
         script {
             def dockerImage = "${env.DOCKER_REGISTRY}/${config.modelName ?: 'diabetes-prediction'}:${env.MODEL_VERSION}"
             
-            echo "🐳 Building Docker image: ${dockerImage}"
+            echo "Building Docker image: ${dockerImage}"
             
             sh """
                 # Copy model artifacts to Docker context
@@ -30,7 +30,7 @@ def call(Map config) {
             
             // Security scan of Docker image
             if (config.runSecurityScan) {
-                echo "🛡️ Scanning Docker image for vulnerabilities..."
+                echo "Scanning Docker image for vulnerabilities..."
                 sh """
                     # Install and run Trivy for vulnerability scanning
                     docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \\
@@ -45,7 +45,7 @@ def call(Map config) {
                                                 usernameVariable: 'DOCKER_USERNAME', 
                                                 passwordVariable: 'DOCKER_PASSWORD')]) {
                     sh """
-                        echo "🚀 Pushing Docker image to registry..."
+                        echo "Pushing Docker image to registry..."
                         echo \$DOCKER_PASSWORD | docker login ${env.DOCKER_REGISTRY} -u \$DOCKER_USERNAME --password-stdin
                         docker push ${dockerImage}
                         
@@ -62,7 +62,7 @@ def call(Map config) {
         
         // Generate Kubernetes deployment manifests
         sh """
-            echo "☸️ Generating Kubernetes manifests..."
+            echo "Generating Kubernetes manifests..."
             
             # Create deployment directory
             mkdir -p artifacts/k8s-manifests
@@ -80,7 +80,7 @@ def call(Map config) {
         // Create Helm chart (if configured)
         if (config.useHelm) {
             sh """
-                echo "⛵ Packaging Helm chart..."
+                echo "Packaging Helm chart..."
                 
                 # Update Chart.yaml with new version
                 sed -i 's/version: .*/version: ${env.MODEL_VERSION}/' helm-chart/Chart.yaml
@@ -99,7 +99,7 @@ def call(Map config) {
         sh """
             . venv/bin/activate || venv\\Scripts\\activate
             
-            echo "📋 Generating model metadata..."
+            echo "Generating model metadata..."
             python src/packaging/generate_metadata.py \\
                 --model-path artifacts/models/best_model.pkl \\
                 --version ${env.MODEL_VERSION} \\
@@ -113,10 +113,10 @@ def call(Map config) {
         archiveArtifacts artifacts: 'artifacts/docker-image.txt', fingerprint: true
         archiveArtifacts artifacts: 'artifacts/trivy-report.json', allowEmptyArchive: true
         
-        echo "✅ Model Packaging completed successfully!"
+        echo "Model Packaging completed successfully!"
         
     } catch (Exception e) {
-        echo "❌ Model Packaging failed: ${e.getMessage()}"
+        echo "Model Packaging failed: ${e.getMessage()}"
         
         // Clean up Docker images on failure
         sh """

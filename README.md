@@ -1,62 +1,75 @@
 # Jenkins Shared Library for MLOps Pipeline
 
-Thư viện chia sẻ Jenkins để triển khai pipeline MLOps tự động hóa hoàn chỉnh cho các dự án Machine Learning.
+A comprehensive Jenkins shared library for automating complete MLOps pipelines for Machine Learning projects.
 
-## 🚀 Tổng quan
+## Overview
 
-Thư viện này cung cấp các bước pipeline tái sử dụng cho MLOps, bao gồm:
+This library provides reusable pipeline steps for MLOps, including:
 
-- **Data Validation** - Kiểm tra chất lượng và tính toàn vẹn dữ liệu
-- **Model Training** - Huấn luyện mô hình với hyperparameter tuning
-- **Model Validation** - Kiểm tra hiệu suất mô hình và quality gates
-- **Model Testing** - Kiểm thử toàn diện (unit, integration, API, performance)
-- **Model Packaging** - Đóng gói mô hình thành Docker container
-- **Model Deployment** - Triển khai mô hình lên Kubernetes
-- **Model Monitoring** - Thiết lập giám sát và cảnh báo
+- **Data Validation**: Data quality and integrity validation
+- **Model Training**: Model training with hyperparameter tuning
+- **Model Validation**: Model performance validation and quality gates
+- **Model Testing**: Comprehensive testing (unit, integration, API, performance)
+- **Model Packaging**: Packaging models into Docker containers
+- **Model Deployment**: Model deployment to Kubernetes
+- **Model Monitoring**: Monitoring and alerting setup
 
-## 📁 Cấu trúc thư viện
+## Library Structure
 
 ```
-jenkins-shared-library/
-├── vars/                           # Global variables và pipeline steps
-│   ├── mlOpsPipeline.groovy       # Pipeline chính MLOps
-│   ├── dataValidation.groovy      # Kiểm tra dữ liệu
-│   ├── modelTraining.groovy       # Huấn luyện mô hình
-│   ├── modelValidation.groovy     # Kiểm tra mô hình
-│   ├── modelTesting.groovy        # Kiểm thử mô hình
-│   ├── modelPackaging.groovy      # Đóng gói mô hình
-│   ├── modelDeployment.groovy     # Triển khai mô hình
-│   ├── modelMonitoring.groovy     # Giám sát mô hình
-│   └── sendNotification.groovy    # Gửi thông báo
-└── src/com/mlops/                 # Utility classes (nếu cần)
+your-ml-project/
+├── requirements.txt
+├── Dockerfile
+├── config/
+│   ├── training_config.yml
+│   └── validation_config.yml
+├── src/
+│   ├── models/
+│   │   ├── train_model.py
+│   │   └── hyperparameter_tuning.py
+│   ├── validation/
+│   │   ├── data_validator.py
+│   │   └── model_validator.py
+│   └── packaging/
+│       └── generate_metadata.py
+├── tests/
+│   ├── unit/
+│   ├── integration/
+│   ├── api/
+│   └── smoke/
+├── k8s/
+│   ├── deployment.yml
+│   ├── service.yml
+│   └── monitoring/
+├── helm-chart/
+└── api/
+    └── main.py
 ```
 
-## 🛠️ Cách sử dụng
+## How to Use
 
-### 1. Cấu hình Jenkins
+### 1. Configure Jenkins
 
-Thêm thư viện chia sẻ vào Jenkins:
-1. Vào **Manage Jenkins** > **Configure System**
-2. Trong phần **Global Pipeline Libraries**, thêm:
+Add the shared library to Jenkins:
+
+1. Go to **Manage Jenkins** > **Configure System**
+2. Under **Global Pipeline Libraries**, add:
    - Name: `mlops-shared-library`
    - Default version: `main`
    - Source Code Management: Git
    - Repository URL: `https://github.com/your-org/jenkins-shared-library.git`
 
-### 2. Sử dụng trong Jenkinsfile
+### 2. Use in Jenkinsfile
 
 ```groovy
 @Library('mlops-shared-library') _
 
-// Cấu hình pipeline
 def config = [
     modelName: 'diabetes-prediction',
     pythonVersion: '3.9',
     dockerRegistry: 'docker.io',
     dockerCredentialsId: 'docker-registry',
     namespace: 'mlops-prod',
-    
-    // Features
     hasApi: true,
     useHelm: true,
     useMlflow: true,
@@ -64,16 +77,12 @@ def config = [
     runSecurityTests: true,
     runSmokeTests: true,
     autoRollback: true,
-    
-    // Monitoring
     enablePrometheus: true,
     enableGrafana: true,
     enableAlerting: true,
     enableLogging: true,
     enableExplainability: true,
     enableABTesting: false,
-    
-    // Notifications
     slackChannel: '#mlops-alerts',
     slackWebhook: 'https://hooks.slack.com/services/...',
     emailRecipients: 'mlops-team@company.com',
@@ -83,11 +92,10 @@ def config = [
     githubTokenId: 'github-token'
 ]
 
-// Chạy pipeline MLOps
 mlOpsPipeline(config)
 ```
 
-### 3. Cấu hình tối thiểu
+#### Minimal Example
 
 ```groovy
 @Library('mlops-shared-library') _
@@ -98,113 +106,54 @@ mlOpsPipeline([
 ])
 ```
 
-## ⚙️ Cấu hình chi tiết
+#### Advanced Example
 
-### Docker Registry
 ```groovy
-dockerRegistry: 'your-registry.com'
-dockerCredentialsId: 'docker-credentials'
+mlOpsPipeline([
+    dockerRegistry: 'your-registry.com',
+    dockerCredentialsId: 'docker-credentials',
+    namespace: 'mlops-production',
+    useHelm: true,
+    autoRollback: true,
+    enablePrometheus: true,
+    enableGrafana: true,
+    enableAlerting: true,
+    enableLogging: true,
+    grafanaUrl: 'https://grafana.company.com',
+    prometheusUrl: 'https://prometheus.company.com',
+    slackChannel: '#ml-deployments',
+    slackWebhook: 'https://hooks.slack.com/services/...',
+    emailRecipients: 'ml-team@company.com,ops-team@company.com',
+    teamsWebhook: 'https://outlook.office.com/webhook/...',
+    updateGitHubStatus: true,
+    githubRepo: 'company/ml-project',
+    githubTokenId: 'github-token'
+])
 ```
 
-### Kubernetes Deployment
-```groovy
-namespace: 'mlops-production'
-useHelm: true
-autoRollback: true
-```
+### Custom Steps
 
-### Monitoring và Alerting
-```groovy
-enablePrometheus: true
-enableGrafana: true
-enableAlerting: true
-enableLogging: true
-grafanaUrl: 'https://grafana.company.com'
-prometheusUrl: 'https://prometheus.company.com'
-```
-
-### Notifications
-```groovy
-// Slack
-slackChannel: '#ml-deployments'
-slackWebhook: 'https://hooks.slack.com/services/...'
-
-// Email
-emailRecipients: 'ml-team@company.com,ops-team@company.com'
-
-// Microsoft Teams
-teamsWebhook: 'https://outlook.office.com/webhook/...'
-
-// GitHub Status
-updateGitHubStatus: true
-githubRepo: 'company/ml-project'
-githubTokenId: 'github-token'
-```
-
-## 📋 Yêu cầu dự án
-
-Để sử dụng thư viện này, dự án của bạn cần có cấu trúc:
-
-```
-your-ml-project/
-├── requirements.txt                # Python dependencies
-├── Dockerfile                     # Docker image cho API
-├── config/
-│   ├── training_config.yml        # Cấu hình training
-│   └── validation_config.yml      # Cấu hình validation
-├── src/
-│   ├── models/
-│   │   ├── train_model.py         # Script training
-│   │   └── hyperparameter_tuning.py
-│   ├── validation/
-│   │   ├── data_validator.py      # Data validation
-│   │   └── model_validator.py     # Model validation
-│   └── packaging/
-│       └── generate_metadata.py   # Model metadata
-├── tests/
-│   ├── unit/                      # Unit tests
-│   ├── integration/               # Integration tests
-│   ├── api/                       # API tests
-│   └── smoke/                     # Smoke tests
-├── k8s/
-│   ├── deployment.yml             # K8s deployment
-│   ├── service.yml                # K8s service
-│   └── monitoring/                # Monitoring configs
-├── helm-chart/                    # Helm chart (nếu sử dụng)
-└── api/
-    └── main.py                    # FastAPI application
-```
-
-## 🔧 Customization
-
-### Tạo bước pipeline tùy chỉnh
-
-Tạo file mới trong `vars/` directory:
+Create custom steps in `vars/`:
 
 ```groovy
 // vars/customStep.groovy
-#!/usr/bin/env groovy
-
 def call(Map config) {
-    echo "🔧 Running custom step..."
-    
-    // Your custom logic here
+    echo "Running custom step..."
     sh """
         echo "Custom step with config: ${config}"
     """
-    
-    echo "✅ Custom step completed!"
+    echo "Custom step completed!"
 }
 ```
 
-### Mở rộng pipeline chính
+Use in pipeline:
 
 ```groovy
 @Library('mlops-shared-library') _
 
 pipeline {
     agent any
-    
+
     stages {
         stage('Custom Pre-processing') {
             steps {
@@ -213,7 +162,6 @@ pipeline {
                 }
             }
         }
-        
         stage('MLOps Pipeline') {
             steps {
                 script {
@@ -221,7 +169,6 @@ pipeline {
                 }
             }
         }
-        
         stage('Custom Post-processing') {
             steps {
                 script {
@@ -233,103 +180,85 @@ pipeline {
 }
 ```
 
-## 📊 Monitoring và Metrics
-
-Pipeline tự động thiết lập các metrics sau:
+## Monitoring and Metrics
 
 ### Model Metrics
-- `model_accuracy` - Độ chính xác mô hình
-- `prediction_confidence` - Độ tin cậy dự đoán
-- `data_drift_score` - Điểm số drift dữ liệu
+
+- `model_accuracy`
+- `prediction_confidence`
+- `data_drift_score`
 
 ### API Metrics
-- `http_requests_total` - Tổng số requests
-- `http_requests_errors_total` - Tổng số lỗi
-- `prediction_duration_seconds` - Thời gian dự đoán
+
+- `http_requests_total`
+- `http_requests_errors_total`
+- `prediction_duration_seconds`
 
 ### System Metrics
-- CPU và Memory usage
+
+- CPU and Memory usage
 - Disk usage
 - Network metrics
 
-## 🚨 Alerting
+## Alerting
 
-Các cảnh báo được cấu hình tự động:
+- High Error Rate > 5%
+- High Latency > 1s
+- Low Model Confidence < 0.7
+- Data Drift Detected
+- Model Degradation
 
-- **High Error Rate** - Tỷ lệ lỗi > 5%
-- **High Latency** - Thời gian phản hồi > 1s
-- **Low Model Confidence** - Độ tin cậy < 0.7
-- **Data Drift Detected** - Phát hiện drift dữ liệu
-- **Model Degradation** - Suy giảm hiệu suất mô hình
-
-## 🔐 Security
+## Security
 
 ### Docker Image Scanning
-Pipeline tự động quét Docker images để tìm lỗ hổng bảo mật sử dụng Trivy.
+
+- Uses Trivy to scan for vulnerabilities
 
 ### Code Security
-- **Bandit** - Quét lỗ hổng Python
-- **Safety** - Kiểm tra dependencies có lỗ hổng
+
+- Bandit: Python code security scanning
+- Safety: Dependency vulnerability scanning
 
 ### Secrets Management
-Sử dụng Jenkins Credentials để quản lý:
-- Docker registry credentials
-- Kubernetes configs
-- Notification webhooks
+
+Managed with Jenkins Credentials:
+
+- Docker credentials
+- Kubernetes config
+- Webhooks
 - GitHub tokens
 
-## 🤝 Contributing
+## Contributing
 
-1. Fork repository
-2. Tạo feature branch
-3. Implement changes
-4. Test với dự án mẫu
-5. Submit pull request
+1. Fork this repository
+2. Create a feature branch
+3. Implement your changes
+4. Test with a sample project
+5. Submit a pull request
 
-## 📚 Examples
+## Examples
 
-Xem thư mục `examples/` để có các ví dụ cụ thể về:
-- Basic MLOps pipeline
-- Advanced configuration
+See the `examples/` folder for:
+
+- Basic pipelines
+- Advanced configurations
 - Custom steps
-- Multi-model deployment
+- Multi-model deployments
 
-## 🆘 Troubleshooting
+## Troubleshooting
 
 ### Common Issues
 
-1. **Docker build fails**
-   ```bash
-   # Kiểm tra Dockerfile và dependencies
-   docker build -t test-image .
-   ```
-
-2. **Kubernetes deployment fails**
-   ```bash
-   # Kiểm tra kubectl config
-   kubectl config current-context
-   kubectl get nodes
-   ```
-
-3. **Model validation fails**
-   ```bash
-   # Kiểm tra validation config
-   python src/validation/model_validator.py --debug
-   ```
-
-### Debug Mode
-
-Bật debug mode trong pipeline:
-```groovy
-mlOpsPipeline([
-    modelName: 'my-model',
-    debug: true  // Bật debug logs
-])
-```
-
-## 📞 Support
-
-- **Documentation**: [Wiki](https://github.com/your-org/jenkins-shared-library/wiki)
-- **Issues**: [GitHub Issues](https://github.com/your-org/jenkins-shared-library/issues)
-- **Slack**: #mlops-support
-- **Email**: mlops-team@company.com
+- **Docker build fails**
+    ```sh
+    docker build -t test-image .
+    ```
+- **Kubernetes context**
+    ```sh
+    kubectl config current-context
+    kubectl get nodes
+    ```
+- **Model validation debug**
+    ```sh
+    python src/validation/model_validator.py --debug
+    ```

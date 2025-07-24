@@ -5,7 +5,7 @@
  * Comprehensive testing including unit tests, integration tests, and API tests
  */
 def call(Map config) {
-    echo "🧪 Starting Model Testing..."
+    echo "Starting Model Testing..."
     
     try {
         sh """
@@ -16,7 +16,7 @@ def call(Map config) {
         sh """
             . venv/bin/activate || venv\\Scripts\\activate
             
-            echo "🔬 Running unit tests..."
+            echo "Running unit tests..."
             python -m pytest tests/unit/ -v --junitxml=test-results/unit-tests.xml --cov=src --cov-report=html:artifacts/coverage/unit
         """
         
@@ -24,7 +24,7 @@ def call(Map config) {
         sh """
             . venv/bin/activate || venv\\Scripts\\activate
             
-            echo "🔗 Running integration tests..."
+            echo "Running integration tests..."
             python -m pytest tests/integration/ -v --junitxml=test-results/integration-tests.xml
         """
         
@@ -33,17 +33,17 @@ def call(Map config) {
             sh """
                 . venv/bin/activate || venv\\Scripts\\activate
                 
-                echo "🚀 Starting API server for testing..."
+                echo "Starting API server for testing..."
                 uvicorn api.main:app --host 0.0.0.0 --port 8000 &
                 API_PID=\$!
                 
-                echo "⏳ Waiting for API to be ready..."
+                echo "Waiting for API to be ready..."
                 sleep 10
                 
-                echo "🌐 Running API tests..."
+                echo "Running API tests..."
                 python -m pytest tests/api/ -v --junitxml=test-results/api-tests.xml
                 
-                echo "🛑 Stopping API server..."
+                echo "Stopping API server..."
                 kill \$API_PID || echo "API server already stopped"
             """
         }
@@ -53,7 +53,7 @@ def call(Map config) {
             sh """
                 . venv/bin/activate || venv\\Scripts\\activate
                 
-                echo "⚡ Running performance tests..."
+                echo "Running performance tests..."
                 python tests/performance/load_test.py --output-dir artifacts/performance
             """
         }
@@ -63,7 +63,7 @@ def call(Map config) {
             sh """
                 . venv/bin/activate || venv\\Scripts\\activate
                 
-                echo "🛡️ Running security tests..."
+                echo "Running security tests..."
                 bandit -r src/ -f json -o artifacts/security/bandit-report.json || echo "Security scan completed with findings"
                 safety check --json --output artifacts/security/safety-report.json || echo "Safety check completed"
             """
@@ -73,7 +73,7 @@ def call(Map config) {
         sh """
             . venv/bin/activate || venv\\Scripts\\activate
             
-            echo "🎯 Testing model inference..."
+            echo "Testing model inference..."
             python tests/model/test_inference.py --model-path artifacts/models/best_model.pkl --output-dir artifacts/inference-tests
         """
         
@@ -95,10 +95,10 @@ def call(Map config) {
         archiveArtifacts artifacts: 'artifacts/security/**/*', allowEmptyArchive: true
         archiveArtifacts artifacts: 'artifacts/inference-tests/**/*', fingerprint: true
         
-        echo "✅ Model Testing completed successfully!"
+        echo "Model Testing completed successfully!"
         
     } catch (Exception e) {
-        echo "❌ Model Testing failed: ${e.getMessage()}"
+        echo "Model Testing failed: ${e.getMessage()}"
         
         // Always publish test results even on failure
         publishTestResults testResultsPattern: 'test-results/*.xml', allowEmptyResults: true
