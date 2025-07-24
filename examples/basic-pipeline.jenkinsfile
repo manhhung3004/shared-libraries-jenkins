@@ -1,0 +1,33 @@
+@Library('mlops-shared-library') _
+
+// Example: Basic MLOps Pipeline Configuration
+def config = [
+    // Basic Configuration
+    modelName: 'diabetes-prediction',
+    pythonVersion: '3.9',
+    dockerRegistry: 'docker.io',
+    dockerCredentialsId: 'docker-registry',
+    
+    // Feature Flags
+    hasApi: true,
+    useHelm: false,
+    useMlflow: false,
+    runLoadTests: false,
+    runSecurityTests: true,
+    runSmokeTests: true,
+    autoRollback: false,
+    
+    // Monitoring (Basic)
+    enablePrometheus: true,
+    enableGrafana: false,
+    enableAlerting: false,
+    enableLogging: false,
+    enableExplainability: false,
+    enableABTesting: false,
+    
+    // Notifications (Basic)
+    emailRecipients: 'dev-team@company.com'
+]
+
+// Run the MLOps pipeline
+mlOpsPipeline(config)

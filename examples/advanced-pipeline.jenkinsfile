@@ -1,0 +1,52 @@
+@Library('mlops-shared-library') _
+
+// Example: Advanced MLOps Pipeline Configuration
+def config = [
+    // Basic Configuration
+    modelName: 'diabetes-prediction',
+    pythonVersion: '3.9',
+    dockerRegistry: 'registry.company.com',
+    dockerCredentialsId: 'company-docker-registry',
+    namespace: 'mlops-production',
+    
+    // Feature Flags - Full MLOps
+    hasApi: true,
+    useHelm: true,
+    useMlflow: true,
+    runLoadTests: true,
+    runSecurityTests: true,
+    runSmokeTests: true,
+    autoRollback: true,
+    runSecurityScan: true,
+    
+    // Monitoring - Full Observability
+    enablePrometheus: true,
+    enableGrafana: true,
+    enableAlerting: true,
+    enableLogging: true,
+    enableExplainability: true,
+    enableABTesting: true,
+    
+    // URLs
+    grafanaUrl: 'https://grafana.company.com',
+    prometheusUrl: 'https://prometheus.company.com',
+    
+    // Notifications - Multi-channel
+    slackChannel: '#mlops-alerts',
+    slackWebhook: 'https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX',
+    emailRecipients: 'mlops-team@company.com,devops-team@company.com',
+    teamsWebhook: 'https://outlook.office.com/webhook/xxx/IncomingWebhook/xxx',
+    
+    // GitHub Integration
+    updateGitHubStatus: true,
+    githubRepo: 'company/diabetes-prediction-model',
+    githubTokenId: 'github-personal-token',
+    
+    // Advanced Features
+    multiRegionDeploy: true,
+    canaryDeployment: true,
+    blueGreenDeployment: false
+]
+
+// Run the MLOps pipeline with full configuration
+mlOpsPipeline(config)
