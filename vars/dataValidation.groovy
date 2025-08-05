@@ -5,7 +5,7 @@
  * Validates data quality, schema, and integrity
  */
 def call(Map config) {
-    echo " Starting Data Validation..."
+    echo "Starting Data Validation..."
     
     try {
         // Setup Python environment
