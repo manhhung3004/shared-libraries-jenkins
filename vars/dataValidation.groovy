@@ -10,10 +10,10 @@ def call(Map config) {
     try {
         // Setup Python environment
         sh """
-            python${config.pythonVersion ?: '3.9'} -m venv venv
+            python3 -m venv venv
             . venv/bin/activate || venv\\Scripts\\activate
-            pip install --upgrade pip
-            pip install -r requirements.txt
+            pip install --upgrade pip --break-system-packages
+            pip install -r requirements.txt --break-system-packages
         """
         
         // Data validation steps
@@ -21,22 +21,22 @@ def call(Map config) {
             . venv/bin/activate || venv\\Scripts\\activate
             
             echo " Checking data schema..."
-            python src/validation/data_validator.py --check-schema
+            python3 src/validation/data_validator.py --check-schema
 
             echo " Validating data quality..."
-            python src/validation/data_validator.py --check-quality
+            python3 src/validation/data_validator.py --check-quality
 
             echo " Checking data distribution..."
-            python src/validation/data_validator.py --check-distribution
+            python3 src/validation/data_validator.py --check-distribution
             
             echo " Detecting data drift..."
-            python src/validation/data_validator.py --check-drift
+            python3 src/validation/data_validator.py --check-drift
         """
         
         // Generate data validation report
         sh """
             . venv/bin/activate || venv\\Scripts\\activate
-            python src/validation/generate_report.py --output-dir artifacts/data-validation
+            python3 src/validation/generate_report.py --output-dir artifacts/data-validation
         """
         
         // Archive validation results
@@ -51,7 +51,7 @@ def call(Map config) {
             mkdir -p artifacts/logs
             cp -r logs/* artifacts/logs/ || echo "No logs to copy"
         """
-        
+    
         throw e
     }
 }
